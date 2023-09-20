@@ -23,6 +23,8 @@ end
 
 def clean_phone_number(phone)
   phone = phone.gsub(/[^0-9]/, '')
+  return phone if phone.length == 10
+
   if phone.length < 10 || phone.length > 11 || phone.length == 11 && phone[0] != '1'
     'Bad number'
   elsif phone.length == 11 && phone[0] != '1'
