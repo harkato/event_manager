@@ -42,6 +42,52 @@ def save_thank_you_letter(id,form_letter)
   end
 end
 
+def save_hour(date)
+  Time.strptime(date, "%m/%d/%Y %R").hour
+end
+
+def save_week_day(date)
+  Time.strptime(date, "%m/%d/%Y %R").wday
+end
+
+def find_peak_hours(registration_hours)
+  day_hours = (1..24).to_a
+  total_count = day_hours.each_with_object({}) { |hour, hash| hash[hour] = 0 }
+
+  # Use reduce para contar as ocorrências
+  total_count = registration_hours.reduce(total_count) do |acc, hour|
+    acc[hour] += 1 if acc.key?(hour)
+    acc
+  end
+
+  # Obtenha as três maiores contagens
+  peak_hours = total_count.values.max
+
+  # Imprima as três maiores contagens e as horas correspondentes
+  total_count.each do |hour, count|    
+    puts "Hour #{hour}: #{count} time(s)" if peak_hours == count
+  end
+end
+
+def find_peak_weekdays(registration_wdays)
+  week = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+  total_count = [0..6].each_with_object({}) { |day, hash| hash[day] = 0 }
+
+  # Use reduce para contar as ocorrências
+  total_count = registration_wdays.reduce(total_count) do |acc, day|
+    acc[day] += 1 if acc.key?(day)
+    acc
+  end
+
+  # Obtenha as três maiores contagens
+  peak_wdays = total_count.values.max
+
+  # Imprima as três maiores contagens e as horas correspondentes
+  total_count.each do |wday, count|    
+    puts "Day #{week[wday]}: #{count} time(s)" if peak_wdays == count
+  end
+end
+
 puts 'Event Manager initialized.'
 
 contents = CSV.open(
@@ -52,15 +98,22 @@ contents = CSV.open(
 
 template_letter = File.read('form_letter.erb')
 erb_template = ERB.new template_letter
+registration_hours = []
+registration_weekdays = []
 
 contents.each do |row|
   id = row[0]
   name = row[:first_name]
   zipcode = clean_zipcode(row[:zipcode])
   phone_number = clean_phone_number(row[:homephone])
+  registration_hours << save_hour(row[:regdate])
+  registration_weekdays << save_week_day(row[:regdate])
   legislators = legislators_by_zipcode(zipcode)
 
   form_letter = erb_template.result(binding)
 
   save_thank_you_letter(id, form_letter)
 end
+
+find_peak_hours(registration_hours)
+find_peak_weekdays(registration_weekdays)
