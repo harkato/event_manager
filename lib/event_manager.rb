@@ -43,48 +43,41 @@ def save_thank_you_letter(id,form_letter)
 end
 
 def save_hour(date)
-  Time.strptime(date, "%m/%d/%Y %R").hour
+  Time.strptime(date, '%m/%d/%Y %R').hour
 end
 
 def save_week_day(date)
-  Time.strptime(date, "%m/%d/%Y %R").wday
+  Time.strptime(date, '%m/%d/%Y %R').wday
 end
 
 def find_peak_hours(registration_hours)
   day_hours = (1..24).to_a
   total_count = day_hours.each_with_object({}) { |hour, hash| hash[hour] = 0 }
 
-  # Use reduce para contar as ocorrências
   total_count = registration_hours.reduce(total_count) do |acc, hour|
     acc[hour] += 1 if acc.key?(hour)
     acc
   end
 
-  # Obtenha as três maiores contagens
   peak_hours = total_count.values.max
-
-  # Imprima as três maiores contagens e as horas correspondentes
   total_count.each do |hour, count|    
-    puts "Hour #{hour}: #{count} time(s)" if peak_hours == count
+    puts "#{hour}h: #{count} time(s)" if peak_hours == count
   end
 end
 
 def find_peak_weekdays(registration_wdays)
   week = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  total_count = [0..6].each_with_object({}) { |day, hash| hash[day] = 0 }
+  total_count = [0, 1, 2, 3, 4, 5, 6].each_with_object({}) { |day, hash| hash[day] = 0 }
 
-  # Use reduce para contar as ocorrências
   total_count = registration_wdays.reduce(total_count) do |acc, day|
     acc[day] += 1 if acc.key?(day)
     acc
   end
 
-  # Obtenha as três maiores contagens
   peak_wdays = total_count.values.max
 
-  # Imprima as três maiores contagens e as horas correspondentes
   total_count.each do |wday, count|    
-    puts "Day #{week[wday]}: #{count} time(s)" if peak_wdays == count
+    puts "Weekday #{week[wday]}: #{count} time(s)" if peak_wdays == count
   end
 end
 
